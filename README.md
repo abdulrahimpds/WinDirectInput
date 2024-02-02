@@ -65,7 +65,7 @@ else:
 ```
 
 Advanced Usage
-`locateImage` comes with several parameters for refined control:
+- `locateImage` comes with several parameters for refined control:
 - `needleImage`: Path to the image you want to find.
 - `haystackImage`: Path to the screenshot or image in which to search. If not provided, it captures the entire screen.
 - `grayscale`: Set to True for grayscale comparison, which can improve performance.
