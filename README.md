@@ -82,5 +82,5 @@ This functionality is especially useful in scenarios where you need to interact 
 
 Your insights and contributions are pivotal to the evolution of WinDirectInput. Here's how you can get involved:
 
-- Report Bugs or Request Features: Encounter a bug or have an idea for a new feature? Open an issue on our GitHub page.
+- Report Bugs or Request Features: Encounter a bug or have an idea for a new feature? Open an issue on our [GitHub](https://github.com/abdulrahimpds/WinDirectInput) page.
 - Code Contributions: Got a fix or enhancement? Submit a pull request to improve the codebase.
