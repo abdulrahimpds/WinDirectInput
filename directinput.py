@@ -478,7 +478,7 @@ def write(text: str, speed=0.0, interval=0.03):
             # If the character isn't in the VK_CODE,
             # copy it to the clipboard and simulate a paste operation
             pyperclip.copy(c)
-            HotKey('ctrl', 'v', interval=interval)
+            hotKey('ctrl', 'v', interval=interval)
         else:
             # Check if the character is in the shiftKeys list
             if c in shiftKeys:
