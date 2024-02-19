@@ -68,7 +68,7 @@ DK_CODE = {
     'backspace': 0x0E, '\b': 0x0E,
     'enter': 0x1C, 'numenter': 0x9C, '\n': 0x1C, '\r': 0x1C,
     'shift': 0x2A, 'lshift': 0x2A, 'rshift': 0x36,
-    'ctrl': 0x1D, 'lcrtl': 0x1D, 'rctrl': 0x9D,
+    'ctrl': 0x1D, 'lctrl': 0x1D, 'rctrl': 0x9D,
     'alt': 0x38, 'lalt': 0x38, 'ralt': 0xB8,
     'win': 0xDB, 'lwin': 0xDB, 'rwin': 0xDC,
     'apps': 0xDD,
@@ -166,7 +166,7 @@ VK_CODE = {
     'backspace': 0x08, '\b': 0x08,
     'enter': 0x0D, 'numenter': 0x0D, '\n': 0x0D, '\r': 0x0D,
     'shift': 0x10, 'lshift': 0x10, 'rshift': 0x10,
-    'ctrl': 0x11, 'lcrtl': 0x11, 'rctrl': 0x11,
+    'ctrl': 0x11, 'lctrl': 0x11, 'rctrl': 0x11,
     'alt': 0x12, 'lalt': 0x12, 'ralt': 0x12,
     'win': 0x5B, 'lwin': 0x5B, 'rwin': 0x5C,
     'apps': 0x5D,
@@ -228,8 +228,10 @@ default_interval = 0.01
 Point = namedtuple("Point", "x y")
 Size = namedtuple("Size", "width height")
 
-# C struct redefinitions 
+# C struct redefinitions
 PUL = ctypes.POINTER(ctypes.c_ulong)
+
+
 class KeyBdInput(ctypes.Structure):
     _fields_ = [("wVk", ctypes.c_ushort),
                 ("wScan", ctypes.c_ushort),
@@ -237,27 +239,32 @@ class KeyBdInput(ctypes.Structure):
                 ("time", ctypes.c_ulong),
                 ("dwExtraInfo", PUL)]
 
+
 class HardwareInput(ctypes.Structure):
     _fields_ = [("uMsg", ctypes.c_ulong),
                 ("wParamL", ctypes.c_short),
                 ("wParamH", ctypes.c_ushort)]
+
 
 class MouseInput(ctypes.Structure):
     _fields_ = [("dx", ctypes.c_long),
                 ("dy", ctypes.c_long),
                 ("mouseData", ctypes.c_ulong),
                 ("dwFlags", ctypes.c_ulong),
-                ("time",ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
                 ("dwExtraInfo", PUL)]
+
 
 class Input_I(ctypes.Union):
     _fields_ = [("ki", KeyBdInput),
-                 ("mi", MouseInput),
-                 ("hi", HardwareInput)]
+                ("mi", MouseInput),
+                ("hi", HardwareInput)]
+
 
 class Input(ctypes.Structure):
     _fields_ = [("type", ctypes.c_ulong),
                 ("ii", Input_I)]
+
 
 # Keyboard Functions
 
@@ -267,7 +274,7 @@ def keyDown(*keys):
     for key in keys:
         try:
             hexKeyCode = DK_CODE[key.lower()]
-        except:
+        except Exception:
             hexKeyCode = 0x00
         virtual_key_codes.append(hexKeyCode)
 
@@ -280,8 +287,8 @@ def keyDown(*keys):
         # Press
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
-        ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
-        x = Input( ctypes.c_ulong(1), ii_ )
+        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
         # Check if the character is in the shiftKeys list
@@ -289,13 +296,14 @@ def keyDown(*keys):
             # Release the shift key
             ctypes.windll.user32.keybd_event(0x10, 0, 2, 0)
 
+
 def keyUp(*keys):
     # Get virtual key code
     virtual_key_codes = []
     for key in keys:
         try:
             hexKeyCode = DK_CODE[key.lower()]
-        except:
+        except Exception:
             hexKeyCode = 0x00
         virtual_key_codes.append(hexKeyCode)
 
@@ -305,17 +313,20 @@ def keyUp(*keys):
             # Press the shift key
             ctypes.windll.user32.keybd_event(0x10, 0, 0, 0)
 
-        # Release    
+        # Release
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
-        ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra) )
-        x = Input( ctypes.c_ulong(1), ii_ )
+        ii_.ki = KeyBdInput(
+            0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra)
+        )
+        x = Input(ctypes.c_ulong(1), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
         # Check if the character is in the shiftKeys list
         if key in shiftKeys:
             # Release the shift key
             ctypes.windll.user32.keybd_event(0x10, 0, 2, 0)
+
 
 @contextmanager
 def keyHold(*keys):
@@ -324,7 +335,7 @@ def keyHold(*keys):
     for key in keys:
         try:
             hexKeyCode = DK_CODE[key.lower()]
-        except:
+        except Exception:
             hexKeyCode = 0x00
         virtual_key_codes.append(hexKeyCode)
 
@@ -343,9 +354,12 @@ def keyHold(*keys):
         # Release
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
-        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
+        ii_.ki = KeyBdInput(
+            0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra)
+        )
         x = Input(ctypes.c_ulong(1), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
 
 def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
     if not isinstance(keys, list):
@@ -360,7 +374,7 @@ def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
                 # Get virtual key code
                 try:
                     hexKeyCode = DK_CODE[key.lower()]
-                except:
+                except Exception:
                     hexKeyCode = 0x00
 
                 # Check if the character is in the shiftKeys list
@@ -371,13 +385,17 @@ def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
                 # Press
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
-                ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra))
+                ii_.ki = KeyBdInput(
+                    0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra)
+                )
                 press_inputs.append(Input(ctypes.c_ulong(1), ii_))
 
                 # Release
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
-                ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
+                ii_.ki = KeyBdInput(
+                    0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra)
+                )
                 release_inputs.append(Input(ctypes.c_ulong(1), ii_))
 
                 # Check if the character is in the shiftKeys list
@@ -388,14 +406,20 @@ def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
             press_inputs_array = (Input * len(keys))()
             for i, input_obj in enumerate(press_inputs):
                 press_inputs_array[i] = input_obj
-            ctypes.windll.user32.SendInput(len(keys), ctypes.pointer(press_inputs_array), ctypes.sizeof(Input))
+            ctypes.windll.user32.SendInput(
+                len(keys), ctypes.pointer(press_inputs_array),
+                ctypes.sizeof(Input)
+            )
 
             time.sleep(interval)
 
             release_inputs_array = (Input * len(keys))()
             for i, input_obj in enumerate(release_inputs):
                 release_inputs_array[i] = input_obj
-            ctypes.windll.user32.SendInput(len(keys), ctypes.pointer(release_inputs_array), ctypes.sizeof(Input))
+            ctypes.windll.user32.SendInput(
+                len(keys), ctypes.pointer(release_inputs_array),
+                ctypes.sizeof(Input)
+            )
 
     else:
         for _ in range(presses):
@@ -403,7 +427,7 @@ def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
                 # Get virtual key code
                 try:
                     hexKeyCode = DK_CODE[key.lower()]
-                except:
+                except Exception:
                     hexKeyCode = 0x00
 
                 # Check if the character is in the shiftKeys list
@@ -414,23 +438,32 @@ def keyPress(keys, interval=default_interval, presses=1, simultaneously=False):
                 # Press
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
-                ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra))
+                ii_.ki = KeyBdInput(
+                    0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra)
+                )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
                 time.sleep(interval)
 
                 # Release
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
-                ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
+                ii_.ki = KeyBdInput(
+                    0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra)
+                )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
                 # Check if the character is in the shiftKeys list
                 if key in shiftKeys:
                     # Release the shift key
                     ctypes.windll.user32.keybd_event(0x10, 0, 2, 0)
+
 
 def hotKey(*keys, interval=default_interval):
     # Get the virtual key codes for the keys in the hotkey sequence
@@ -439,10 +472,10 @@ def hotKey(*keys, interval=default_interval):
         # Get virtual key code
         try:
             hexKeyCode = DK_CODE[key.lower()]
-        except:
+        except Exception:
             hexKeyCode = 0x00
         virtual_key_codes.append(hexKeyCode)
-    
+
     # Press the keys in the hotkey sequence
     for hexKeyCode in virtual_key_codes:
         # Press
@@ -453,17 +486,20 @@ def hotKey(*keys, interval=default_interval):
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
         time.sleep(interval)
-    
+
     # Release the keys in reverse order
     for hexKeyCode in reversed(virtual_key_codes):
         # Release
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
-        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
+        ii_.ki = KeyBdInput(
+            0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra)
+        )
         x = Input(ctypes.c_ulong(1), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
         time.sleep(interval)
+
 
 def write(text: str, speed=0.0, interval=0.03):
     # Load the user32 library
@@ -471,10 +507,11 @@ def write(text: str, speed=0.0, interval=0.03):
 
     # Iterate through each character in the text
     for c in text:
-        # Look up the virtual key code for the character in the VK_CODE dictionary
+        # Look up the virtual key code for the character
+        # in the VK_CODE dictionary
         try:
             vk_code = VK_CODE[c]
-        except:
+        except Exception:
             # If the character isn't in the VK_CODE,
             # copy it to the clipboard and simulate a paste operation
             pyperclip.copy(c)
@@ -485,12 +522,14 @@ def write(text: str, speed=0.0, interval=0.03):
                 # Press the shift key
                 user32.keybd_event(0x10, 0, 0, 0)
 
-            # Send a WM_KEYDOWN message for the key corresponding to the virtual key code
+            # Send a WM_KEYDOWN message for the key
+            # corresponding to the virtual key code
             user32.keybd_event(vk_code, 0, 0, 0)
 
             time.sleep(interval)
 
-            # Send a WM_KEYUP message for the key corresponding to the virtual key code
+            # Send a WM_KEYUP message for the key
+            # corresponding to the virtual key code
             user32.keybd_event(vk_code, 0, 2, 0)
 
             # Check if the character is in the shiftKeys list
@@ -500,6 +539,7 @@ def write(text: str, speed=0.0, interval=0.03):
 
         # Define the time delay between each characters
         time.sleep(speed)
+
 
 def keyDetect(keys):
     # Check if keys is a single key (string) and convert it to a list
@@ -522,6 +562,7 @@ def keyDetect(keys):
     # If all keys are pressed, return True
     return True
 
+
 # Mouse Functions
 
 def mouseClick(button='left', interval=default_interval, presses=1):
@@ -539,9 +580,12 @@ def mouseClick(button='left', interval=default_interval, presses=1):
         # Send mouse button release event
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
-        ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
+        ii_.mi = MouseInput(
+            0, 0, 0, button_code << 1, 0, ctypes.pointer(extra)
+        )
         x = Input(ctypes.c_ulong(0), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
 
 def mouseDown(button='left'):
     button_code = MB_CODE.get(button.lower())
@@ -552,6 +596,7 @@ def mouseDown(button='left'):
     x = Input(ctypes.c_ulong(0), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
+
 def mouseUp(button='left'):
     button_code = MB_CODE.get(button.lower())
     # Send mouse button release event
@@ -560,6 +605,7 @@ def mouseUp(button='left'):
     ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(0), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
 
 @contextmanager
 def mouseHold(button='left'):
@@ -582,9 +628,10 @@ def mouseHold(button='left'):
     x = Input(ctypes.c_ulong(0), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
+
 def moveMouseTo(x=None, y=None, duration=0.0):
     # Get the current mouse position
-    current_x, current_y = get_mouse_position()
+    current_x, current_y = getMousePosition()
 
     if x is None:
         x = current_x
@@ -617,10 +664,11 @@ def moveMouseTo(x=None, y=None, duration=0.0):
         current_y += step_y
         ctypes.windll.user32.SetCursorPos(int(current_x), int(current_y))
 
-def moveMouse(x_offset=0, y_offset=0, duration=0.0):
-    current_x, current_y = get_mouse_position()
-    x = current_x + x_offset
-    y = current_y + y_offset
+
+def moveMouse(xOffset=0, yOffset=0, duration=0.0):
+    current_x, current_y = getMousePosition()
+    x = current_x + xOffset
+    y = current_y + yOffset
 
     distance_x = x - current_x
     distance_y = y - current_y
@@ -638,9 +686,11 @@ def moveMouse(x_offset=0, y_offset=0, duration=0.0):
         current_y += step_y
         ctypes.windll.user32.SetCursorPos(int(current_x), int(current_y))
 
+
 def scrollMouse(clicks):
     if clicks != 0:
         ctypes.windll.user32.mouse_event(0x0800, 0, 0, clicks, 0)
+
 
 # Other Functions
 
@@ -652,13 +702,15 @@ def screenshot(filename=None, region=None):
 
     if filename:
         img.save(filename)
-        
+
     return img
+
 
 def getMousePosition():
     cursor = wintypes.POINT()
     windll.user32.GetCursorPos(byref(cursor))
     return Point(cursor.x, cursor.y)
+
 
 def getDisplaySize():
     user32 = ctypes.windll.user32
@@ -666,8 +718,9 @@ def getDisplaySize():
     height = user32.GetSystemMetrics(1)
     return Size(width, height)
 
+
 def locateImage(needleImage, haystackImage=None, grayscale=False,
-                 region=None, threshold=0.999):
+                region=None, threshold=0.999):
     needleImage = cv2.imread(needleImage)
     if haystackImage is None:
         # Take a screenshot of the entire screen
