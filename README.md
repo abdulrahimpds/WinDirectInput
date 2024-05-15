@@ -57,7 +57,7 @@ import directinput
 import directinput
 
 # Writing a string with special characters
-directinput.write("Hello, world!")
+directinput.write("Hello, world! ✌️")
 ```
 
 This demonstrates the enhanced write function, capable of handling a wide range of characters, surpassing limitations you might find in other modules.
