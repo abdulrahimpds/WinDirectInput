@@ -71,6 +71,9 @@ All the keys listed can be detected as well as pressed, except `xbutton1` and `x
 - **Control Keys**:
   - `space`, `esc`, `tab`, `backspace`, `enter`, `numenter`, `shift`, `lshift`, `rshift`, `ctrl`, `lctrl`, `rctrl`, `alt`, `lalt`, `ralt`, `win`, `lwin`, `rwin`, `apps`, `capslock`, `numlock`, `scrolllock`, `insert`, `delete`, `home`, `end`, `pageup`, `pagedown`, `prtsc`, `sysrq`
 
+- **Calculation Keys**:
+  - `num-`, `num/`, `num*`, `num+`, `num.`
+
 - **Arrow Keys**: 
   - `up`, `down`, `left`, `right`
 
