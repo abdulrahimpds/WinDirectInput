@@ -49,6 +49,39 @@ import directinput
 - `getDisplaySize()`
 - `locateImage(needleImage=str, haystackImage=str, grayscale=bool, region=tuple, threshold=float)`: Searches for an image (`needleImage`) within another image (`haystackImage`) or the screen. If `haystackImage` is not provided, the entire screen is used. The `grayscale` parameter can be set to `True` to perform the search in grayscale, which can improve performance. The `region` parameter can specify a specific area to search within, and `threshold` sets the accuracy required for a match.
 
+## Available Keys and Mouse Buttons
+
+All the keys listed can be detected as well as pressed, except `xbutton1` and `xbutton2`, which cannot be pressed.
+
+### Keyboard Keys
+
+- **Alphabets**: 
+  - `a`, `A`, `b`, `B`, `c`, `C`, `d`, `D`, `e`, `E`, `f`, `F`, `g`, `G`, `h`, `H`, `i`, `I`, `j`, `J`, `k`, `K`, `l`, `L`, `m`, `M`, `n`, `N`, `o`, `O`, `p`, `P`, `q`, `Q`, `r`, `R`, `s`, `S`, `t`, `T`, `u`, `U`, `v`, `V`, `w`, `W`, `x`, `X`, `y`, `Y`, `z`, `Z`
+
+- **Numbers**: 
+  - `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`
+  - `num0`, `num1`, `num2`, `num3`, `num4`, `num5`, `num6`, `num7`, `num8`, `num9`
+
+- **Symbols**:
+  - `` ` ``, `~`, `!`, `@`, `#`, `$`, `%`, `^`, `&`, `*`, `(`, `)`, `-`, `_`, `=`, `+`, `[`, `{`, `]`, `}`, `\`, `|`, `;`, `:`, `'`, `"`, `,`, `<`, `.`, `>`, `/`, `?`
+
+- **Function Keys**: 
+  - `f1`, `f2`, `f3`, `f4`, `f5`, `f6`, `f7`, `f8`, `f9`, `f10`, `f11`, `f12`
+
+- **Control Keys**:
+  - `space`, `esc`, `tab`, `backspace`, `enter`, `numenter`, `shift`, `lshift`, `rshift`, `ctrl`, `lctrl`, `rctrl`, `alt`, `lalt`, `ralt`, `win`, `lwin`, `rwin`, `apps`, `capslock`, `numlock`, `scrolllock`, `insert`, `delete`, `home`, `end`, `pageup`, `pagedown`, `prtsc`, `sysrq`
+
+- **Arrow Keys**: 
+  - `up`, `down`, `left`, `right`
+
+### Mouse Buttons
+
+- **Primary Buttons**: 
+  - `left`, `right`, `middle`
+
+- **Additional Buttons**: 
+  - `xbutton1` (can only be detected), `xbutton2` (can only be detected)
+
 ## Example Usage
 
 ### Writing Complex Strings
@@ -70,6 +103,10 @@ import directinput
 # Detect if the 'A' key is being pressed
 if directinput.keyDetect('a'):
     print("The 'A' key is pressed!")
+
+# Detect if both 'left_mouse' and 'xbutton1' is being pressed
+if directinput.keyDetect(['left_mouse', 'xbutton1']):
+    print("Pressed!")
 ```
 
 ### Locating an Image on the Screen

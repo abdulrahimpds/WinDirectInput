@@ -247,11 +247,18 @@ EXTENDED_KEYS = [
     'prtsc', 'sysrq', 'ralt', 'rctrl', 'win', 'rwin', 'lwin'
 ]
 
-# Define virtual codes for mouse input
+# Define direct codes for mouse input
 MB_CODE = {
     'left': 0x0002,
     'right': 0x0008,
     'middle': 0x0020
+}
+
+# Define virtual codes for mouse detection
+MVB_CODE = {
+    'left_mouse': 0x01,
+    'right_mouse': 0x02,
+    'middle_mouse': 0x04
 }
 
 # C struct redefinitions
@@ -810,6 +817,7 @@ def keyDetect(keys):
     Parameters:
     keys : str or list of str
         The key or list of keys to check. The key names should correspond to the key mappings.
+        It can take keyboard keys and also mouse buttons.
 
     Returns:
     bool
@@ -818,7 +826,10 @@ def keyDetect(keys):
     Example:
     keyDetect('a')             # Check if the 'a' key is pressed.
     keyDetect(['ctrl', 'c'])   # Check if both 'ctrl' and 'c' keys are pressed.
+    keyDetect(['left_mouse'])  # Check if left mouse button is pressed.
+    keyDetect(['xbutton1'])    # Check if mouse xbutton1 is pressed.
     """
+    KEY_CODE = {**VK_CODE, **MVB_CODE}
 
     # Check if keys is a single key (string) and convert it to a list
     if isinstance(keys, str):
@@ -826,7 +837,7 @@ def keyDetect(keys):
 
     # Check the state of each key in the list
     for key in keys:
-        key_code = VK_CODE.get(key.lower(), None)
+        key_code = KEY_CODE.get(key.lower(), None)
         if key_code is None:
             # Handle the case where the key is not recognized
             print(f"Warning: Key '{key}' not recognized.")
