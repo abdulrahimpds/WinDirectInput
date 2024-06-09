@@ -213,7 +213,7 @@ import directinput
     - `filename` (str, optional): The file path to save the screenshot. If not specified, the screenshot is not saved.
     - `region` (tuple, optional): A tuple specifying the region to capture (top-left x, top-left y, width, height). If not specified, captures the entire screen.
   - **Returns:**
-    - `Image`: The captured screenshot as an Image object if the filename is given.
+    - `Image`: The captured screenshot as an Image object.
   - **Example:**
     ```python
     directinput.screenshot('screenshot.png')
