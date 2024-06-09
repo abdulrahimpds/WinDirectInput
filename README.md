@@ -26,28 +26,240 @@ import directinput
 - `pyscreeze`, `pyperclip`: Supporting libraries enhancing the module's functionality.
 
 ## Functionalities
-- `keyDown(key=str)`
-- `keyUp(key=str)`
-- `keyHold(key=str)`: Simulates holding down one or more specified keys. The keys parameter can be a single key or a list of keys. This function should be used with a with statement to ensure that the keys are released after the block of code is executed. For example:
+
+### Keyboard Functions
+
+- **`keyDown(*keys)`**
+  - Simulates pressing down one or more keys.
+  - **Parameters:**
+    - `*keys` (str): One or more keys to press down. Key names should correspond to key mappings.
+  - **Example:**
+    ```python
+    directinput.keyDown('ctrl', 'a')
+    ```
+
+- **`keyUp(*keys)`**
+  - Simulates releasing one or more keys.
+  - **Parameters:**
+    - `*keys` (str): One or more keys to release. Key names should correspond to key mappings.
+  - **Example:**
+    ```python
+    directinput.keyUp('ctrl', 'shift')
+    ```
+
+- **`keyHold(*keys)`**
+  - Simulates holding down one or more specified keys.
+  - The keys parameter can be a single key or a list of keys.
+  - This function should be used with a `with` statement to ensure that the keys are released after the block of code is executed.
+  - **Parameters:**
+    - `*keys` (str): One or more keys to hold down.
+  - **Example:**
     ```python
     with directinput.keyHold("ctrl", "shift"):
         directinput.keyPress("esc")
     ```
-- `keyPress(key=str, presses=int, simultaneously=bool)`: Simulates pressing one or more keys. The `keys` parameter can be a single key or a list of keys. Additionally, the `simultaneously` parameter can be set to True to press all keys at once, rather than sequentially.
-- `hotKey(*keys=str)`: Simulates pressing a combination of keys simultaneously. This function can accept multiple key arguments, e.g., `hotKey('ctrl', 'shift', 's')`.
-- `write(text=str, speed=float)`: Types out a given text string. Optionally, `speed` (in seconds) between key presses can be specified to simulate a more natural typing speed.
-- `keyDetect(key=str)`: Checks if one or more specified keys are currently pressed. The `keys` parameter can be a single key (as a string) or a list of keys. The function returns `True` if all specified keys are pressed, and `False` if any key is not pressed or not recognized.
-- `mouseClick(button=str, presses=int)`
-- `mouseDown(button=str)`
-- `mouseUp(button=str)`
-- `mouseHold(button=str)`: Simulates holding down a specified mouse button, similar to the `keyHold` function. The `button` parameter can be 'left', 'right', or 'middle'. This function should be used with a `with` statement to ensure that the mouse button is released after the block of code is executed.
-- `moveMouseTo(x=int/float, y=int/float, duration=int/float)`
-- `moveMouse(xOffset=int/float, yOffset=int/float, duration=int/float)`: Moves the mouse cursor relative to its current position by specified x and y offsets over a specified duration.
-- `scrollMouse(clicks=int)`: Scrolls the mouse wheel vertically. The `clicks` parameter determines the amount and direction of the scroll: a positive value scrolls up, while a negative value scrolls down. For a visible result, it is recommended to use a value of 100 or more, as smaller numbers may not produce a significant scrolling.
-- `screenshot(filename=str, region=tuple)`: Takes a screenshot of the entire screen. Additionally, there's a `region` parameter which captures specified region of the screen. It takes a tuple specifying the top-left x, top-left y, width, and height.
-- `getMousePosition()`: Returns the current (x, y) position of the mouse cursor.
-- `getDisplaySize()`
-- `locateImage(needleImage=str, haystackImage=str, grayscale=bool, region=tuple, threshold=float)`: Searches for an image (`needleImage`) within another image (`haystackImage`) or the screen. If `haystackImage` is not provided, the entire screen is used. The `grayscale` parameter can be set to `True` to perform the search in grayscale, which can improve performance. The `region` parameter can specify a specific area to search within, and `threshold` sets the accuracy required for a match.
+
+- **`keyPress(keys, interval=0.01, presses=1, key_delay=0.01, simultaneously=False)`**
+  - Simulates pressing one or more keys.
+  - The `keys` parameter can be a single key or a list of keys.
+  - Additionally, the `simultaneously` parameter can be set to `True` to press all keys at once, rather than sequentially.
+  - **Parameters:**
+    - `keys` (str or list of str): The key or list of keys to press. Key names should correspond to key mappings.
+    - `interval` (float, optional): The interval between key presses in seconds. Default is 0.01.
+    - `presses` (int, optional): The number of times to press the keys. Default is 1.
+    - `key_delay` (float, optional): The delay between each key press and release in seconds. Default is 0.01.
+    - `simultaneously` (bool, optional): Whether to press all keys at once. Default is False.
+  - **Example:**
+    ```python
+    directinput.keyPress('a')
+    directinput.keyPress(['ctrl', 'c'])
+    directinput.keyPress(['ctrl', 'shift'], simultaneously=True)
+    directinput.keyPress('b', presses=3, interval=0.5)
+    ```
+
+- **`hotKey(*keys, key_delay=0.01)`**
+  - Simulates pressing a combination of keys, which are pressed down in order, and then released in reverse order.
+  - This function can accept multiple key arguments.
+  - **Parameters:**
+    - `*keys` (str): One or more keys to press as part of the hotkey combination.
+    - `key_delay` (float, optional): The delay between each key press and release in seconds. Default is 0.01.
+  - **Example:**
+    ```python
+    directinput.hotKey('ctrl', 'shift', 'esc')
+    ```
+
+- **`write(text, interval=0.0, key_delay=0.03)`**
+  - Types out a given text string.
+  - Optionally, `interval` (in seconds) between key presses can be specified to simulate a more natural typing speed.
+  - **Parameters:**
+    - `text` (str): The text string to type out.
+    - `interval` (float, optional): The interval between each character in seconds. Default is 0.0.
+    - `key_delay` (float, optional): The delay between key press and release for each character in seconds. Default is 0.03.
+  - **Example:**
+    ```python
+    directinput.write("Hello, World!", interval=0.1)
+    ```
+
+- **`keyDetect(*keys)`**
+  - Checks if one or more specified keys are currently pressed.
+  - The `keys` parameter can be a single key (as a string) or a list of keys.
+  - **Parameters:**
+    - `*keys` (str): The key or a combination of keys to check. It can take keyboard keys and also mouse buttons.
+  - **Returns:**
+    - `bool`: `True` if all specified keys are pressed, `False` otherwise.
+  - **Example:**
+    ```python
+    directinput.keyDetect('a')           # Check if the 'a' key is pressed.
+    directinput.keyDetect('ctrl', 'c')   # Check if both 'ctrl' and 'c' keys are pressed.
+    directinput.keyDetect('left_mouse')  # Check if left mouse button is pressed.
+    directinput.keyDetect('xbutton1')    # Check if mouse xbutton1 is pressed.
+    ```
+
+### Mouse Functions
+
+- **`mouseClick(button='left', interval=0.01, presses=1, key_delay=0.01)`**
+  - Simulates mouse click events.
+  - **Parameters:**
+    - `button` (str, optional): The mouse button to click ('left', 'right', or 'middle'). Default is 'left'.
+    - `interval` (float, optional): The interval (in seconds) between each click. Default is 0.01.
+    - `presses` (int, optional): The number of times to click the mouse button. Default is 1.
+    - `key_delay` (float, optional): The delay (in seconds) between each click down and click release. Default is 0.01.
+  - **Example:**
+    ```python
+    directinput.mouseClick('left')
+    directinput.mouseClick('right', presses=2, interval=0.5)
+    directinput.mouseClick('middle', presses=3)
+    ```
+
+- **`mouseDown(button='left')`**
+  - Simulates pressing down a mouse button.
+  - **Parameters:**
+    - `button` (str, optional): The mouse button to press ('left', 'right', or 'middle'). Default is 'left'.
+  - **Example:**
+    ```python
+    directinput.mouseDown('left')
+    directinput.mouseDown('right')
+    directinput.mouseDown('middle')
+    ```
+
+- **`mouseUp(button='left')`**
+  - Simulates releasing a mouse button.
+  - **Parameters:**
+    - `button` (str, optional): The mouse button to release ('left', 'right', or 'middle'). Default is 'left'.
+  - **Example:**
+    ```python
+    directinput.mouseUp('left')
+    directinput.mouseUp('right')
+    directinput.mouseUp('middle')
+    ```
+
+- **`mouseHold(button='left')`**
+  - Simulates holding down a specified mouse button, similar to the `keyHold` function.
+  - The `button` parameter can be 'left', 'right', or 'middle'.
+  - This function should be used with a `with` statement to ensure that the mouse button is released after the block of code is executed.
+  - **Parameters:**
+    - `button` (str, optional): The mouse button to hold down ('left', 'right', or 'middle'). Default is 'left'.
+  - **Example:**
+    ```python
+    with directinput.mouseHold('right'):
+        directinput.keyPress("esc")
+    ```
+
+- **`moveMouseTo(x=None, y=None, duration=0.0)`**
+  - Moves the mouse cursor to a specified position over a given duration.
+  - **Parameters:**
+    - `x` (int or float, optional): The target x-coordinate for the mouse cursor. If not specified, the current x-coordinate is used.
+    - `y` (int or float, optional): The target y-coordinate for the mouse cursor. If not specified, the current y-coordinate is used.
+    - `duration` (int or float, optional): The duration over which the mouse cursor should move to the target position, in seconds. Default is 0.0.
+  - **Example:**
+    ```python
+    directinput.moveMouseTo(100, 200)
+    directinput.moveMouseTo(300, 400, 1.0)
+    directinput.moveMouseTo(y=500, duration=0.5)
+    ```
+
+- **`moveMouse(xOffset=0, yOffset=0, duration=0.0)`**
+  - Moves the mouse cursor relative to its current position by specified x and y offsets over a specified duration.
+  - **Parameters:**
+    - `xOffset` (int or float, optional): The offset in the x direction to move the mouse cursor. Default is 0.
+    - `yOffset` (int or float, optional): The offset in the y direction to move the mouse cursor. Default is 0.
+    - `duration` (int or float, optional): The duration over which the mouse cursor should move to the new position, in seconds. Default is 0.0.
+  - **Example:**
+    ```python
+    directinput.moveMouse(100, 50)
+    directinput.moveMouse(-50, 0, 1.0)
+    directinput.moveMouse(yOffset=100, duration=0.5)
+    ```
+
+- **`scrollMouse(clicks)`**
+  - Scrolls the mouse wheel vertically.
+  - The `clicks` parameter determines the amount and direction of the scroll: a positive value scrolls up, while a negative value scrolls down.
+  - For a visible result, it is recommended to use a value of 100 or more, as smaller numbers may not produce a significant scrolling.
+  - **Parameters:**
+    - `clicks` (int): The number of clicks to scroll. Positive values scroll up, negative values scroll down.
+  - **Example:**
+    ```python
+    directinput.scrollMouse(120)   # Scroll up with a value of 120 clicks.
+    directinput.scrollMouse(-100)  # Scroll down with a value of 100 clicks.
+    ```
+
+### Utility Functions
+
+- **`screenshot(filename=None, region=None)`**
+  - Takes a screenshot of the entire screen.
+  - Additionally, there's a `region` parameter which captures specified region of the screen.
+  - It takes a tuple specifying the top-left x, top-left y, width, and height.
+  - **Parameters:**
+    - `filename` (str, optional): The file path to save the screenshot. If not specified, the screenshot is not saved.
+    - `region` (tuple, optional): A tuple specifying the region to capture (top-left x, top-left y, width, height). If not specified, captures the entire screen.
+  - **Returns:**
+    - `Image`: The captured screenshot as an Image object if the filename is given.
+  - **Example:**
+    ```python
+    directinput.screenshot('screenshot.png')
+    directinput.screenshot(region=(0, 0, 800, 600))
+    directinput.screenshot('region.png', region=(100, 100, 300, 200))
+    ```
+
+- **`getMousePosition()`**
+  - Returns the current (x, y) position of the mouse cursor.
+  - **Returns:**
+    - `Point`: The current mouse cursor position as (x, y).
+  - **Example:**
+    ```python
+    position = directinput.getMousePosition()
+    print(position.x, position.y)
+    ```
+
+- **`getDisplaySize()`**
+  - Returns the width and height of the primary display.
+  - **Returns:**
+    - `Size`: The size of the primary display as (width, height).
+  - **Example:**
+    ```python
+    display_size = directinput.getDisplaySize()
+    print(display_size.width, display_size.height)
+    ```
+
+- **`locateImage(needleImage, haystackImage=None, grayscale=False, region=None, threshold=0.999)`**
+  - Searches for an image (`needleImage`) within another image (`haystackImage`) or the screen.
+  - If `haystackImage` is not provided, the entire screen is used.
+  - The `grayscale` parameter can be set to `True` to perform the search in grayscale, which can improve performance.
+  - The `region` parameter can specify a specific area to search within, and `threshold` sets the accuracy required for a match.
+  - **Parameters:**
+    - `needleImage` (str): The file path of the image to locate.
+    - `haystackImage` (str, optional): The file path of the image in which to search. If not provided, the entire screen is used.
+    - `grayscale` (bool, optional): Whether to perform the search in grayscale. Default is False.
+    - `region` (tuple, optional): A tuple specifying the region to search within (top-left x, top-left y, width, height). If not specified, the entire image or screen is used.
+    - `threshold` (float, optional): The confidence threshold for image matching. Default is 0.999.
+  - **Returns:**
+    - `Point` or `None`: The center coordinates of the located image as (x, y), or None if the image is not found.
+  - **Example:**
+    ```python
+    position = directinput.locateImage('needle.png')
+    position = directinput.locateImage('needle.png', 'haystack.png', grayscale=True, threshold=0.95)
+    position = directinput.locateImage('needle.png', region=(0, 0, 800, 600))
+    ```
 
 ## Available Keys and Mouse Buttons
 
@@ -127,16 +339,6 @@ if point is not None:
 else:
     print("Image not found")
 ```
-
-Advanced Usage
-- `locateImage` comes with several parameters for refined control:
-- `needleImage`: Path to the image you want to find.
-- `haystackImage`: Path to the screenshot or image in which to search. If not provided, it captures the entire screen.
-- `grayscale`: Set to True for grayscale comparison, which can improve performance.
-- `region`: A specific region on the screen to search in.
-- `threshold`: The confidence level for image matching, allowing for slight variations.
-
-This functionality is especially useful in scenarios where you need to interact with UI elements based on their appearance, or in cases where dynamic content changes the screen layout.
 
 ## How Does It Work?
 

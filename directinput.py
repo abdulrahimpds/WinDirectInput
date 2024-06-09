@@ -1,6 +1,7 @@
 """
-This module provides direct input control functions for simulating keyboard and mouse events on Windows.
-It is useful for automated testing, creating macros, and other applications requiring simulated user input.
+This module provides direct input control functions for simulating keyboard
+and mouse events on Windows. It is useful for automated testing, creating
+macros, and other applications requiring simulated user input.
 """
 
 import cv2
@@ -258,7 +259,9 @@ MB_CODE = {
 MVB_CODE = {
     'left_mouse': 0x01,
     'right_mouse': 0x02,
-    'middle_mouse': 0x04
+    'middle_mouse': 0x04,
+    'xbutton1': 0x05,
+    'xbutton2': 0x06
 }
 
 # C struct redefinitions
@@ -307,7 +310,8 @@ def keyDown(*keys):
 
     Parameters:
     *keys : str
-        One or more keys to press down. The key names should correspond to the key mappings.
+        One or more keys to press down. The key names should correspond to
+        the key mappings.
 
     Example:
     keyDown('x', 'y') or keyDown('a')
@@ -342,7 +346,9 @@ def keyDown(*keys):
                     0, 0xE0, KEYEVENTF_SCANCODE, 0, ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Press the key
         extra = ctypes.c_ulong(0)
@@ -351,7 +357,9 @@ def keyDown(*keys):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
         # Check if the character is in the shiftKeys list
         if key in SHIFT_KEYS:
@@ -365,7 +373,8 @@ def keyUp(*keys):
 
     Parameters:
     *keys : str
-        One or more keys to release. The key names should correspond to the key mappings.
+        One or more keys to release. The key names should correspond to
+        the key mappings.
 
     Example:
     keyUp('x', 'y') or keyUp('a')
@@ -397,10 +406,13 @@ def keyUp(*keys):
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
                 ii_.ki = KeyBdInput(
-                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0, ctypes.pointer(extra)
+                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0,
+                    ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Release the key
         extra = ctypes.c_ulong(0)
@@ -409,7 +421,9 @@ def keyUp(*keys):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
         # Check if the character is in the shiftKeys list
         if key in SHIFT_KEYS:
@@ -423,12 +437,14 @@ def keyHold(*keys):
     Simulate holding down one or more specified keys.
 
     This function simulates pressing and holding one or more specified keys.
-    The keys parameter should be a string, not a list. This function should be used with a
-    `with` statement to ensure that the keys are released after the block of code is executed.
+    The keys parameter should be a string, not a list. This function should be
+    used with a `with` statement to ensure that the keys are released after the
+    block of code is executed.
 
     Parameters:
     *keys : str
-        One or more keys to hold down. The key names should correspond to the key mappings.
+        One or more keys to hold down. The key names should correspond to
+        the key mappings.
 
     Example:
     with keyHold('ctrl', 'shift'):
@@ -459,7 +475,9 @@ def keyHold(*keys):
                     0, 0xE0, KEYEVENTF_SCANCODE, 0, ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Press the key
         extra = ctypes.c_ulong(0)
@@ -468,7 +486,9 @@ def keyHold(*keys):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
     # Yield control to the calling function
     yield
@@ -485,10 +505,13 @@ def keyHold(*keys):
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
                 ii_.ki = KeyBdInput(
-                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0, ctypes.pointer(extra)
+                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0,
+                    ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Release the key
         extra = ctypes.c_ulong(0)
@@ -497,35 +520,41 @@ def keyHold(*keys):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
 
-def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
+def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1,
+             key_delay=DEFAULT_INTERVAL, simultaneously=False):
     """
     Simulate pressing one or more keys.
 
     This function simulates pressing and releasing one or more specified keys.
-    The keys parameter can be a single key or a list of keys. The keys can be pressed either
-    simultaneously or sequentially based on the `simultaneously` parameter.
-    Additionally, the function allows specifying the number of times to press the keys and
-    the interval between presses.
+    The keys parameter can be a single key or a list of keys. The keys can be
+    pressed either simultaneously or sequentially based on the
+    `simultaneously` parameter. Additionally, the function allows specifying
+    the number of times to press the keys and the interval between presses.
 
     Parameters:
     keys : str or list of str
-        The key or list of keys to press. The key names should correspond to the key mappings.
+        The key or list of keys to press. The key names should correspond to
+        the key mappings.
     interval : float, optional
         The interval between key presses in seconds (default is 0.01).
     presses : int, optional
         The number of times to press the keys (default is 1).
+    key_delay : float, optional
+        The delay between each key press and release in seconds (default is 0.01).
     simultaneously : bool, optional
         Whether to press all keys at once (default is False).
         If False, keys are pressed sequentially.
 
     Example:
-    keyPress('a')                 # Press the 'a' key once.
-    keyPress(['ctrl', 'c'])       # Press 'ctrl' and 'c' sequentially.
+    keyPress('a')                                      # Press the 'a' key once.
+    keyPress(['ctrl', 'c'])                            # Press 'ctrl' and 'c' sequentially.
     keyPress(['ctrl', 'shift'], simultaneously=True)   # Press 'ctrl' and 'shift' simultaneously.
-    keyPress('b', presses=3, interval=0.5)  # Press the 'b' key 3 times with 0.5-second interval.
+    keyPress('b', presses=3, interval=0.5)             # Press the 'b' key 3 times with 0.5-second interval.
     """
 
     if not isinstance(keys, list):
@@ -562,7 +591,9 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
                             0, 0xE0, KEYEVENTF_SCANCODE, 0, ctypes.pointer(extra)
                         )
                         x = Input(ctypes.c_ulong(1), ii_)
-                        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                        ctypes.windll.user32.SendInput(
+                            1, ctypes.pointer(x), ctypes.sizeof(x)
+                        )
 
                 # Press
                 extra = ctypes.c_ulong(0)
@@ -576,7 +607,8 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
                 ii_.ki = KeyBdInput(
-                    0, hexKeyCode, keybdFlags | KEYEVENTF_KEYUP, 0, ctypes.pointer(extra)
+                    0, hexKeyCode, keybdFlags | KEYEVENTF_KEYUP, 0,
+                    ctypes.pointer(extra)
                 )
                 release_inputs.append(Input(ctypes.c_ulong(1), ii_))
 
@@ -589,17 +621,21 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
             for i, input_obj in enumerate(press_inputs):
                 press_inputs_array[i] = input_obj
             ctypes.windll.user32.SendInput(
-                len(keys), ctypes.pointer(press_inputs_array), ctypes.sizeof(Input)
+                len(keys), ctypes.pointer(press_inputs_array),
+                ctypes.sizeof(Input)
             )
 
-            time.sleep(interval)
+            time.sleep(key_delay)
 
             release_inputs_array = (Input * len(keys))()
             for i, input_obj in enumerate(release_inputs):
                 release_inputs_array[i] = input_obj
             ctypes.windll.user32.SendInput(
-                len(keys), ctypes.pointer(release_inputs_array), ctypes.sizeof(Input)
+                len(keys), ctypes.pointer(release_inputs_array),
+                ctypes.sizeof(Input)
             )
+
+            time.sleep(interval)
 
     else:
         for _ in range(presses):
@@ -629,7 +665,9 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
                             0, 0xE0, KEYEVENTF_SCANCODE, 0, ctypes.pointer(extra)
                         )
                         x = Input(ctypes.c_ulong(1), ii_)
-                        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                        ctypes.windll.user32.SendInput(
+                            1, ctypes.pointer(x), ctypes.sizeof(x)
+                        )
 
                 # Press
                 extra = ctypes.c_ulong(0)
@@ -638,9 +676,11 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
                     0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
-                time.sleep(interval)
+                time.sleep(key_delay)
 
                 # Release
                 extra = ctypes.c_ulong(0)
@@ -649,15 +689,19 @@ def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1, simultaneously=False):
                     0, hexKeyCode, keybdFlags | KEYEVENTF_KEYUP, 0, ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
                 # Check if the character is in the shiftKeys list
                 if key in SHIFT_KEYS:
                     # Release the shift key
                     ctypes.windll.user32.keybd_event(0x10, 0, 2, 0)
 
+                time.sleep(interval)
 
-def hotKey(*keys, interval=DEFAULT_INTERVAL):
+
+def hotKey(*keys, **kwargs):
     """
     Simulate pressing a combination of keys simultaneously.
 
@@ -668,13 +712,15 @@ def hotKey(*keys, interval=DEFAULT_INTERVAL):
     Parameters:
     *keys : str
         One or more keys to press as part of the hotkey combination.
-        The key names should correspond to the key mappings.
-    interval : float, optional
-        The interval between each key press and release in seconds (default is 0.01).
+        The key names should correspond to
+        the key mappings.
+    key_delay : float, optional
+        The delay between each key press and release in seconds (default is 0.01).
 
     Example:
-    hotKey('ctrl', 'shift', 'esc')  # Simulate pressing 'Ctrl + Shift + S' simultaneously.
+    hotKey('ctrl', 'shift', 'esc')  # Simulate pressing 'Ctrl + Shift + Esc' simultaneously.
     """
+    key_delay = kwargs.get('key_delay', DEFAULT_INTERVAL)
 
     # Get the virtual key codes for the keys in the hotkey sequence
     virtual_key_codes = []
@@ -702,7 +748,9 @@ def hotKey(*keys, interval=DEFAULT_INTERVAL):
                     0, 0xE0, KEYEVENTF_SCANCODE, 0, ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Press
         extra = ctypes.c_ulong(0)
@@ -711,9 +759,11 @@ def hotKey(*keys, interval=DEFAULT_INTERVAL):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
-        time.sleep(interval)
+        time.sleep(key_delay)
 
     # Release the keys in reverse order
     for key, hexKeyCode in reversed(virtual_key_codes):
@@ -728,10 +778,13 @@ def hotKey(*keys, interval=DEFAULT_INTERVAL):
                 extra = ctypes.c_ulong(0)
                 ii_ = Input_I()
                 ii_.ki = KeyBdInput(
-                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0, ctypes.pointer(extra)
+                    0, 0xE0, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP, 0,
+                    ctypes.pointer(extra)
                 )
                 x = Input(ctypes.c_ulong(1), ii_)
-                ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+                ctypes.windll.user32.SendInput(
+                    1, ctypes.pointer(x), ctypes.sizeof(x)
+                )
 
         # Release
         extra = ctypes.c_ulong(0)
@@ -740,12 +793,14 @@ def hotKey(*keys, interval=DEFAULT_INTERVAL):
             0, hexKeyCode, keybdFlags, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(1), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
-        time.sleep(interval)
+        time.sleep(key_delay)
 
 
-def write(text: str, speed=0.0, interval=0.03):
+def write(text: str, interval=0.0, key_delay=0.03):
     """
     Types out a given text string.
 
@@ -757,13 +812,13 @@ def write(text: str, speed=0.0, interval=0.03):
     Parameters:
     text : str
         The text string to type out.
-    speed : float, optional
-        The time delay (in seconds) between each character (default is 0.0).
     interval : float, optional
-        The interval between key press and release for each character (default is 0.03 seconds).
+        The interval (in seconds) between each character (default is 0.0).
+    key_delay : float, optional
+        The delay between key press and release for each character (default is 0.03 seconds).
 
     Example:
-    write("Hello, World!", speed=0.1)
+    write("Hello, World!", interval=0.1)
     """
 
     # Load the user32 library
@@ -779,7 +834,7 @@ def write(text: str, speed=0.0, interval=0.03):
             # If the character isn't in the VK_CODE,
             # copy it to the clipboard and simulate a paste operation
             pyperclip.copy(c)
-            hotKey('ctrl', 'v', interval=interval)
+            hotKey('ctrl', 'v', interval=key_delay)
         else:
             # Check if the character is in the shiftKeys list
             if c in SHIFT_KEYS:
@@ -790,7 +845,7 @@ def write(text: str, speed=0.0, interval=0.03):
             # corresponding to the virtual key code
             user32.keybd_event(vk_code, 0, 0, 0)
 
-            time.sleep(interval)
+            time.sleep(key_delay)
 
             # Send a WM_KEYUP message for the key
             # corresponding to the virtual key code
@@ -802,21 +857,22 @@ def write(text: str, speed=0.0, interval=0.03):
                 user32.keybd_event(0x10, 0, 2, 0)
 
         # Define the time delay between each characters
-        time.sleep(speed)
+        time.sleep(interval)
 
 
-def keyDetect(keys):
+def keyDetect(*keys):
     """
     Check if one or more specified keys are currently pressed.
 
     This function checks the state of one or more specified keys to determine
-    if they are currently pressed. The keys parameter can be a single key (as a string) or a list.
+    if they are currently pressed. The keys parameter can be a single key (as a string) or a combination.
     The function returns True if all specified keys are pressed,
     and False if any key is not pressed or not recognized.
 
     Parameters:
-    keys : str or list of str
-        The key or list of keys to check. The key names should correspond to the key mappings.
+    keys : str
+        The key or list of keys to check. The key names should correspond to
+        the key mappings.
         It can take keyboard keys and also mouse buttons.
 
     Returns:
@@ -824,10 +880,10 @@ def keyDetect(keys):
         True if all specified keys are pressed, False otherwise.
 
     Example:
-    keyDetect('a')             # Check if the 'a' key is pressed.
-    keyDetect(['ctrl', 'c'])   # Check if both 'ctrl' and 'c' keys are pressed.
-    keyDetect(['left_mouse'])  # Check if left mouse button is pressed.
-    keyDetect(['xbutton1'])    # Check if mouse xbutton1 is pressed.
+    keyDetect('a')           # Check if the 'a' key is pressed.
+    keyDetect('ctrl', 'c')   # Check if both 'ctrl' and 'c' keys are pressed.
+    keyDetect('left_mouse')  # Check if left mouse button is pressed.
+    keyDetect('xbutton1')    # Check if mouse xbutton1 is pressed.
     """
     KEY_CODE = {**VK_CODE, **MVB_CODE}
 
@@ -854,7 +910,8 @@ def keyDetect(keys):
 
 # Mouse Functions
 
-def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1):
+def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1,
+               key_delay=DEFAULT_INTERVAL):
     """
     Simulate mouse click events.
 
@@ -866,14 +923,16 @@ def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1):
     button : str, optional
         The mouse button to click ('left', 'right', or 'middle'). Default is 'left'.
     interval : float, optional
-        The time interval (in seconds) between each click down and click release.
+        The interval (in seconds) between each clicks.
     presses : int, optional
         The number of times to click the mouse button. Default is 1.
+    key_delay: float, optional
+        The delay (in seconds) between each click down and click release.
 
     Example:
-    mouseClick('left')           # Click the left mouse button once.
+    mouseClick('left')                            # Click the left mouse button once.
     mouseClick('right', presses=2, interval=0.5)  # Double-click the right mouse button with a 0.5-second interval.
-    mouseClick('middle', presses=3)  # Triple-click the middle mouse button.
+    mouseClick('middle', presses=3)               # Triple-click the middle mouse button.
     """
 
     button_code = MB_CODE.get(button.lower())
@@ -883,9 +942,11 @@ def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1):
         ii_ = Input_I()
         ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
         x = Input(ctypes.c_ulong(0), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
-        time.sleep(interval)
+        time.sleep(key_delay)
 
         # Send mouse button release event
         extra = ctypes.c_ulong(0)
@@ -894,7 +955,11 @@ def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1):
             0, 0, 0, button_code << 1, 0, ctypes.pointer(extra)
         )
         x = Input(ctypes.c_ulong(0), ii_)
-        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
+
+        time.sleep(interval)
 
 
 def mouseDown(button='left'):
@@ -920,7 +985,9 @@ def mouseDown(button='left'):
     ii_ = Input_I()
     ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    ctypes.windll.user32.SendInput(
+        1, ctypes.pointer(x), ctypes.sizeof(x)
+    )
 
 
 def mouseUp(button='left'):
@@ -946,7 +1013,9 @@ def mouseUp(button='left'):
     ii_ = Input_I()
     ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    ctypes.windll.user32.SendInput(
+        1, ctypes.pointer(x), ctypes.sizeof(x)
+    )
 
 
 @contextmanager
@@ -965,8 +1034,7 @@ def mouseHold(button='left'):
 
     Example:
     with mouseHold('left'):
-        # Perform actions while the left mouse button is held down
-        pass
+        directinput.keyPress("esc")
     """
 
     button_code = MB_CODE.get(button.lower())
@@ -976,7 +1044,9 @@ def mouseHold(button='left'):
     ii_ = Input_I()
     ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    ctypes.windll.user32.SendInput(
+        1, ctypes.pointer(x), ctypes.sizeof(x)
+    )
 
     # Yield control to the calling function
     yield
@@ -986,7 +1056,9 @@ def mouseHold(button='left'):
     ii_ = Input_I()
     ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    ctypes.windll.user32.SendInput(
+        1, ctypes.pointer(x), ctypes.sizeof(x)
+    )
 
 
 def moveMouseTo(x=None, y=None, duration=0.0):
@@ -1007,8 +1079,8 @@ def moveMouseTo(x=None, y=None, duration=0.0):
         in seconds. Default is 0.0, which moves the cursor instantly.
 
     Example:
-    moveMouseTo(100, 200)          # Instantly move the cursor to (100, 200).
-    moveMouseTo(300, 400, 1.0)     # Move the cursor to (300, 400) over 1 second.
+    moveMouseTo(100, 200)             # Instantly move the cursor to (100, 200).
+    moveMouseTo(300, 400, 1.0)        # Move the cursor to (300, 400) over 1 second.
     moveMouseTo(y=500, duration=0.5)  # Move the cursor vertically to y=500 over 0.5 seconds.
     """
 
@@ -1064,8 +1136,8 @@ def moveMouse(xOffset=0, yOffset=0, duration=0.0):
         in seconds. Default is 0.0, which moves the cursor instantly.
 
     Example:
-    moveMouse(100, 50)           # Instantly move the cursor 100 pixels right and 50 pixels down.
-    moveMouse(-50, 0, 1.0)       # Move the cursor 50 pixels left over 1 second.
+    moveMouse(100, 50)                    # Instantly move the cursor 100 pixels right and 50 pixels down.
+    moveMouse(-50, 0, 1.0)                # Move the cursor 50 pixels left over 1 second.
     moveMouse(yOffset=100, duration=0.5)  # Move the cursor 100 pixels down over 0.5 seconds.
     """
 
@@ -1113,7 +1185,7 @@ def scrollMouse(clicks):
         ctypes.windll.user32.mouse_event(0x0800, 0, 0, clicks, 0)
 
 
-# Other Functions
+# Utility Functions
 
 def screenshot(filename=None, region=None):
     """
@@ -1137,9 +1209,9 @@ def screenshot(filename=None, region=None):
         The captured screenshot as an Image object.
 
     Example:
-    screenshot('screenshot.png')                          # Capture the entire screen and save as 'screenshot.png'.
-    screenshot(region=(0, 0, 800, 600))                   # Capture a region of the screen.
-    screenshot('region.png', region=(100, 100, 300, 200)) # Capture a region and save as 'region.png'.
+    screenshot('screenshot.png')                           # Capture the entire screen and save as 'screenshot.png'.
+    screenshot(region=(0, 0, 800, 600))                    # Capture a region of the screen.
+    screenshot('region.png', region=(100, 100, 300, 200))  # Capture a region and save as 'region.png'.
     """
 
     if region:
@@ -1225,9 +1297,9 @@ def locateImage(needleImage, haystackImage=None, grayscale=False,
         The center coordinates of the located image as (x, y), or None if the image is not found.
 
     Example:
-    position = locateImage('needle.png')  # Search for 'needle.png' on the entire screen.
+    position = locateImage('needle.png')                                                  # Search for 'needle.png' on the entire screen.
     position = locateImage('needle.png', 'haystack.png', grayscale=True, threshold=0.95)  # Search within 'haystack.png' in grayscale with 95% confidence.
-    position = locateImage('needle.png', region=(0, 0, 800, 600))  # Search within a specific region of the screen.
+    position = locateImage('needle.png', region=(0, 0, 800, 600))                         # Search within a specific region of the screen.
     """
 
     needleImage = cv2.imread(needleImage)
