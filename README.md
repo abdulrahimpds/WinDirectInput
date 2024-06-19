@@ -210,7 +210,7 @@ import directinput
   - Additionally, there's a `region` parameter which captures specified region of the screen.
   - It takes a tuple specifying the top-left x, top-left y, width, and height.
   - **Parameters:**
-    - `filename` (str, optional): The file path to save the screenshot. If not specified, the screenshot is not saved.
+    - `filename` (str, optional): The file path to save the screenshot. This can be any valid file type such as .png, .jpg, .pdf, etc. If not specified, the screenshot is not saved.
     - `region` (tuple, optional): A tuple specifying the region to capture (top-left x, top-left y, width, height). If not specified, captures the entire screen.
   - **Returns:**
     - `Image`: The captured screenshot as an Image object.
