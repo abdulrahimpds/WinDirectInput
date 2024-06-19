@@ -525,7 +525,7 @@ def keyHold(*keys):
         )
 
 
-def keyPress(keys, interval=DEFAULT_INTERVAL, presses=1,
+def keyPress(keys, interval=0, presses=1,
              key_delay=DEFAULT_INTERVAL, simultaneously=False):
     """
     Simulate pressing one or more keys.
@@ -870,7 +870,7 @@ def keyDetect(*keys):
     and False if any key is not pressed or not recognized.
 
     Parameters:
-    keys : str or list of str
+    keys : str
         The key or list of keys to check. The key names should correspond to
         the key mappings.
         It can take keyboard keys and also mouse buttons.
@@ -887,16 +887,12 @@ def keyDetect(*keys):
     """
     KEY_CODE = {**VK_CODE, **MVB_CODE}
 
-    # Flatten the keys to handle both strings and lists
-    flattened_keys = []
-    for key in keys:
-        if isinstance(key, list):
-            flattened_keys.extend(key)
-        else:
-            flattened_keys.append(key)
+    # Check if keys is a single key (string) and convert it to a list
+    if isinstance(keys, str):
+        keys = [keys]
 
     # Check the state of each key in the list
-    for key in flattened_keys:
+    for key in keys:
         key_code = KEY_CODE.get(key.lower(), None)
         if key_code is None:
             # Handle the case where the key is not recognized
@@ -914,7 +910,7 @@ def keyDetect(*keys):
 
 # Mouse Functions
 
-def mouseClick(button='left', interval=DEFAULT_INTERVAL, presses=1,
+def mouseClick(button='left', interval=0, presses=1,
                key_delay=DEFAULT_INTERVAL):
     """
     Simulate mouse click events.
