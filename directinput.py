@@ -4,17 +4,17 @@ and mouse events on Windows. It is useful for automated testing, creating
 macros, and other applications requiring simulated user input.
 """
 
-import cv2
-import numpy as np
 import ctypes
 import mss
-import time
 import pyscreeze
 import pyperclip
 
-from ctypes import windll, wintypes, byref
-from contextlib import contextmanager
+from time import sleep
 from collections import namedtuple
+from contextlib import contextmanager
+from ctypes import windll, wintypes, byref
+from numpy import array
+from cv2 import imread, cvtColor, COLOR_BGR2GRAY, COLOR_BGR2RGB
 
 # Constants
 DEFAULT_INTERVAL = 0.01
@@ -625,7 +625,7 @@ def keyPress(keys, interval=0, presses=1,
                 ctypes.sizeof(Input)
             )
 
-            time.sleep(key_delay)
+            sleep(key_delay)
 
             release_inputs_array = (Input * len(keys))()
             for i, input_obj in enumerate(release_inputs):
@@ -635,7 +635,7 @@ def keyPress(keys, interval=0, presses=1,
                 ctypes.sizeof(Input)
             )
 
-            time.sleep(interval)
+            sleep(interval)
 
     else:
         for _ in range(presses):
@@ -680,7 +680,7 @@ def keyPress(keys, interval=0, presses=1,
                     1, ctypes.pointer(x), ctypes.sizeof(x)
                 )
 
-                time.sleep(key_delay)
+                sleep(key_delay)
 
                 # Release
                 extra = ctypes.c_ulong(0)
@@ -698,7 +698,7 @@ def keyPress(keys, interval=0, presses=1,
                     # Release the shift key
                     ctypes.windll.user32.keybd_event(0x10, 0, 2, 0)
 
-                time.sleep(interval)
+                sleep(interval)
 
 
 def hotKey(*keys, **kwargs):
@@ -763,7 +763,7 @@ def hotKey(*keys, **kwargs):
             1, ctypes.pointer(x), ctypes.sizeof(x)
         )
 
-        time.sleep(key_delay)
+        sleep(key_delay)
 
     # Release the keys in reverse order
     for key, hexKeyCode in reversed(virtual_key_codes):
@@ -797,7 +797,7 @@ def hotKey(*keys, **kwargs):
             1, ctypes.pointer(x), ctypes.sizeof(x)
         )
 
-        time.sleep(key_delay)
+        sleep(key_delay)
 
 
 def write(text: str, interval=0.0, key_delay=0.03):
@@ -845,7 +845,7 @@ def write(text: str, interval=0.0, key_delay=0.03):
             # corresponding to the virtual key code
             user32.keybd_event(vk_code, 0, 0, 0)
 
-            time.sleep(key_delay)
+            sleep(key_delay)
 
             # Send a WM_KEYUP message for the key
             # corresponding to the virtual key code
@@ -857,7 +857,7 @@ def write(text: str, interval=0.0, key_delay=0.03):
                 user32.keybd_event(0x10, 0, 2, 0)
 
         # Define the time delay between each characters
-        time.sleep(interval)
+        sleep(interval)
 
 
 def keyDetect(*keys):
@@ -946,7 +946,7 @@ def mouseClick(button='left', interval=0, presses=1,
             1, ctypes.pointer(x), ctypes.sizeof(x)
         )
 
-        time.sleep(key_delay)
+        sleep(key_delay)
 
         # Send mouse button release event
         extra = ctypes.c_ulong(0)
@@ -959,7 +959,7 @@ def mouseClick(button='left', interval=0, presses=1,
             1, ctypes.pointer(x), ctypes.sizeof(x)
         )
 
-        time.sleep(interval)
+        sleep(interval)
 
 
 def mouseDown(button='left'):
@@ -1113,7 +1113,7 @@ def moveMouseTo(x=None, y=None, duration=0.0):
 
     # Move the cursor in a linear way over the specified duration
     for i in range(steps):
-        time.sleep(duration / steps)
+        sleep(duration / steps)
         current_x += step_x
         current_y += step_y
         ctypes.windll.user32.SetCursorPos(int(current_x), int(current_y))
@@ -1156,7 +1156,7 @@ def moveMouse(xOffset=0, yOffset=0, duration=0.0):
     step_y = distance_y / steps
 
     for i in range(steps):
-        time.sleep(duration / steps)
+        sleep(duration / steps)
         current_x += step_x
         current_y += step_y
         ctypes.windll.user32.SetCursorPos(int(current_x), int(current_y))
@@ -1267,7 +1267,7 @@ def getDisplaySize():
 
 
 def locateImage(needleImage, haystackImage=None, grayscale=False,
-                region=None, threshold=0.999):
+                region=None, threshold=0.990):
     """
     Search for an image within another image or the screen.
 
@@ -1302,20 +1302,20 @@ def locateImage(needleImage, haystackImage=None, grayscale=False,
     position = locateImage('needle.png', region=(0, 0, 800, 600))                         # Search within a specific region of the screen.
     """
 
-    needleImage = cv2.imread(needleImage)
+    needleImage = imread(needleImage)
     if haystackImage is None:
         # Take a screenshot of the entire screen
         with mss.mss() as sct:
-            haystackImage = np.array(sct.grab(sct.monitors[1]))
+            haystackImage = array(sct.grab(sct.monitors[1]))
     else:
-        haystackImage = cv2.imread(haystackImage)
+        haystackImage = imread(haystackImage)
 
     if grayscale:
-        needleImage = cv2.cvtColor(needleImage, cv2.COLOR_BGR2GRAY)
-        haystackImage = cv2.cvtColor(haystackImage, cv2.COLOR_BGR2GRAY)
+        needleImage = cvtColor(needleImage, COLOR_BGR2GRAY)
+        haystackImage = cvtColor(haystackImage, COLOR_BGR2GRAY)
     else:
-        needleImage = cv2.cvtColor(needleImage, cv2.COLOR_BGR2RGB)
-        haystackImage = cv2.cvtColor(haystackImage, cv2.COLOR_BGR2RGB)
+        needleImage = cvtColor(needleImage, COLOR_BGR2RGB)
+        haystackImage = cvtColor(haystackImage, COLOR_BGR2RGB)
     # Find the image
     coords = pyscreeze.locate(needleImage, haystackImage,
                               region=region, confidence=threshold)
@@ -1323,5 +1323,5 @@ def locateImage(needleImage, haystackImage=None, grayscale=False,
         return None
     else:
         # Return the center coordinates of the image
-        center_x, center_y = coords[0] + coords[2]/2, coords[1] + coords[3]/2
+        center_x, center_y = float(coords[0] + coords[2]/2), float(coords[1] + coords[3]/2)
         return Point(center_x, center_y)
