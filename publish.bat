@@ -1,0 +1,9 @@
+@echo off
+echo Installing necessary tools...
+pip install setuptools wheel twine
+
+echo Building the package...
+python setup.py sdist bdist_wheel
+
+echo Uploading the package to PyPI...
+twine upload dist/*
