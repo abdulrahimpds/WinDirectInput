@@ -2,7 +2,7 @@ import directinput as di
 
 while True:
     try:
-        if di.keyDetect('d'):
+        if di.keyDetect('d', 's'):
             print("pss")
             break
     except Exception as e:
