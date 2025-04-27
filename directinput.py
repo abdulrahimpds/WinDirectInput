@@ -248,7 +248,7 @@ EXTENDED_KEYS = [
     'prtsc', 'sysrq', 'ralt', 'rctrl', 'win', 'rwin', 'lwin'
 ]
 
-# Define direct codes for mouse input
+# Define direct codes for mouse input (for SendInput)
 MB_CODE = {
     'left': 0x0002,
     'right': 0x0008,
@@ -262,6 +262,22 @@ MVB_CODE = {
     'middle_mouse': 0x04,
     'xbutton1': 0x05,
     'xbutton2': 0x06
+}
+
+# Define mouse_event flags
+MOUSEEVENTF_LEFTDOWN = 0x0002
+MOUSEEVENTF_LEFTUP = 0x0004
+MOUSEEVENTF_RIGHTDOWN = 0x0008
+MOUSEEVENTF_RIGHTUP = 0x0010
+MOUSEEVENTF_MIDDLEDOWN = 0x0020
+MOUSEEVENTF_MIDDLEUP = 0x0040
+MOUSEEVENTF_XDOWN = 0x0080
+MOUSEEVENTF_XUP = 0x0100
+
+# Define mouse data values for xbuttons (for mouse_event)
+XBUTTON_DATA = {
+    'xbutton1': 0x0001,
+    'xbutton2': 0x0002
 }
 
 # C struct redefinitions
@@ -919,7 +935,7 @@ def mouseClick(button='left', interval=0, presses=1,
 
     Parameters:
     button : str, optional
-        The mouse button to click ('left', 'right', or 'middle'). Default is 'left'.
+        The mouse button to click ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
     interval : float, optional
         The interval (in seconds) between each clicks.
     presses : int, optional
@@ -931,33 +947,53 @@ def mouseClick(button='left', interval=0, presses=1,
     mouseClick('left')                            # Click the left mouse button once.
     mouseClick('right', presses=2, interval=0.5)  # Double-click the right mouse button with a 0.5-second interval.
     mouseClick('middle', presses=3)               # Triple-click the middle mouse button.
+    mouseClick('xbutton1')                        # Click the first extra mouse button (xbutton1).
+    mouseClick('xbutton2')                        # Click the second extra mouse button (xbutton2).
     """
 
-    button_code = MB_CODE.get(button.lower())
-    for _ in range(presses):
-        # Send mouse button press event
-        extra = ctypes.c_ulong(0)
-        ii_ = Input_I()
-        ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
-        x = Input(ctypes.c_ulong(0), ii_)
-        ctypes.windll.user32.SendInput(
-            1, ctypes.pointer(x), ctypes.sizeof(x)
-        )
+    button = button.lower()
 
-        sleep(key_delay)
+    # Use different approach for xbuttons vs regular buttons
+    if button in ['xbutton1', 'xbutton2']:
+        # Get the xbutton data value
+        mouse_data = XBUTTON_DATA.get(button, 0)
 
-        # Send mouse button release event
-        extra = ctypes.c_ulong(0)
-        ii_ = Input_I()
-        ii_.mi = MouseInput(
-            0, 0, 0, button_code << 1, 0, ctypes.pointer(extra)
-        )
-        x = Input(ctypes.c_ulong(0), ii_)
-        ctypes.windll.user32.SendInput(
-            1, ctypes.pointer(x), ctypes.sizeof(x)
-        )
+        for _ in range(presses):
+            # Press the xbutton
+            ctypes.windll.user32.mouse_event(MOUSEEVENTF_XDOWN, 0, 0, mouse_data, 0)
+            sleep(key_delay)
 
-        sleep(interval)
+            # Release the xbutton
+            ctypes.windll.user32.mouse_event(MOUSEEVENTF_XUP, 0, 0, mouse_data, 0)
+            sleep(interval)
+    else:
+        # Regular buttons use SendInput
+        button_code = MB_CODE.get(button)
+
+        for _ in range(presses):
+            # Send mouse button press event
+            extra = ctypes.c_ulong(0)
+            ii_ = Input_I()
+            ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
+            x = Input(ctypes.c_ulong(0), ii_)
+            ctypes.windll.user32.SendInput(
+                1, ctypes.pointer(x), ctypes.sizeof(x)
+            )
+
+            sleep(key_delay)
+
+            # Send mouse button release event
+            extra = ctypes.c_ulong(0)
+            ii_ = Input_I()
+            ii_.mi = MouseInput(
+                0, 0, 0, button_code << 1, 0, ctypes.pointer(extra)
+            )
+            x = Input(ctypes.c_ulong(0), ii_)
+            ctypes.windll.user32.SendInput(
+                1, ctypes.pointer(x), ctypes.sizeof(x)
+            )
+
+            sleep(interval)
 
 
 def mouseDown(button='left'):
@@ -969,23 +1005,37 @@ def mouseDown(button='left'):
 
     Parameters:
     button : str, optional
-        The mouse button to press ('left', 'right', or 'middle'). Default is 'left'.
+        The mouse button to press ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
 
     Example:
-    mouseDown('left')    # Press down the left mouse button.
-    mouseDown('right')   # Press down the right mouse button.
-    mouseDown('middle')  # Press down the middle mouse button.
+    mouseDown('left')     # Press down the left mouse button.
+    mouseDown('right')    # Press down the right mouse button.
+    mouseDown('middle')   # Press down the middle mouse button.
+    mouseDown('xbutton1') # Press down the first extra mouse button.
+    mouseDown('xbutton2') # Press down the second extra mouse button.
     """
 
-    button_code = MB_CODE.get(button.lower())
-    # Send mouse button press event
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
-    x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(
-        1, ctypes.pointer(x), ctypes.sizeof(x)
-    )
+    button = button.lower()
+
+    # Use different approach for xbuttons vs regular buttons
+    if button in ['xbutton1', 'xbutton2']:
+        # Get the xbutton data value
+        mouse_data = XBUTTON_DATA.get(button, 0)
+
+        # Press the xbutton
+        ctypes.windll.user32.mouse_event(MOUSEEVENTF_XDOWN, 0, 0, mouse_data, 0)
+    else:
+        # Regular buttons use SendInput
+        button_code = MB_CODE.get(button)
+
+        # Send mouse button press event
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(0), ii_)
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
 
 def mouseUp(button='left'):
@@ -997,23 +1047,37 @@ def mouseUp(button='left'):
 
     Parameters:
     button : str, optional
-        The mouse button to release ('left', 'right', or 'middle'). Default is 'left'.
+        The mouse button to release ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
 
     Example:
-    mouseUp('left')    # Release the left mouse button.
-    mouseUp('right')   # Release the right mouse button.
-    mouseUp('middle')  # Release the middle mouse button.
+    mouseUp('left')     # Release the left mouse button.
+    mouseUp('right')    # Release the right mouse button.
+    mouseUp('middle')   # Release the middle mouse button.
+    mouseUp('xbutton1') # Release the first extra mouse button.
+    mouseUp('xbutton2') # Release the second extra mouse button.
     """
 
-    button_code = MB_CODE.get(button.lower())
-    # Send mouse button release event
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
-    x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(
-        1, ctypes.pointer(x), ctypes.sizeof(x)
-    )
+    button = button.lower()
+
+    # Use different approach for xbuttons vs regular buttons
+    if button in ['xbutton1', 'xbutton2']:
+        # Get the xbutton data value
+        mouse_data = XBUTTON_DATA.get(button, 0)
+
+        # Release the xbutton
+        ctypes.windll.user32.mouse_event(MOUSEEVENTF_XUP, 0, 0, mouse_data, 0)
+    else:
+        # Regular buttons use SendInput
+        button_code = MB_CODE.get(button)
+
+        # Send mouse button release event
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(0), ii_)
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
 
 @contextmanager
@@ -1022,41 +1086,60 @@ def mouseHold(button='left'):
     Simulate holding down a specified mouse button.
 
     This function simulates pressing and holding down a specified mouse button.
-    The button parameter can be 'left', 'right', or 'middle'.
+    The button parameter can be 'left', 'right', 'middle', 'xbutton1', or 'xbutton2'.
     This function should be used with a `with` statement to ensure that
     the mouse button is released after the block of code is executed.
 
     Parameters:
     button : str, optional
-        The mouse button to hold down ('left', 'right', or 'middle'). Default is 'left'.
+        The mouse button to hold down ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
 
     Example:
     with mouseHold('left'):
         directinput.keyPress("esc")
+    with mouseHold('xbutton1'):
+        directinput.keyPress("a")
     """
 
-    button_code = MB_CODE.get(button.lower())
+    button = button.lower()
 
-    # Send mouse button press event
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
-    x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(
-        1, ctypes.pointer(x), ctypes.sizeof(x)
-    )
+    # Use different approach for xbuttons vs regular buttons
+    if button in ['xbutton1', 'xbutton2']:
+        # Get the xbutton data value
+        mouse_data = XBUTTON_DATA.get(button, 0)
 
-    # Yield control to the calling function
-    yield
+        # Press the xbutton
+        ctypes.windll.user32.mouse_event(MOUSEEVENTF_XDOWN, 0, 0, mouse_data, 0)
 
-    # Send mouse button release event
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
-    x = Input(ctypes.c_ulong(0), ii_)
-    ctypes.windll.user32.SendInput(
-        1, ctypes.pointer(x), ctypes.sizeof(x)
-    )
+        # Yield control to the calling function
+        yield
+
+        # Release the xbutton
+        ctypes.windll.user32.mouse_event(MOUSEEVENTF_XUP, 0, 0, mouse_data, 0)
+    else:
+        # Regular buttons use SendInput
+        button_code = MB_CODE.get(button)
+
+        # Send mouse button press event
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.mi = MouseInput(0, 0, 0, button_code, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(0), ii_)
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
+
+        # Yield control to the calling function
+        yield
+
+        # Send mouse button release event
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.mi = MouseInput(0, 0, 0, button_code << 1, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(0), ii_)
+        ctypes.windll.user32.SendInput(
+            1, ctypes.pointer(x), ctypes.sizeof(x)
+        )
 
 
 def moveMouseTo(x=None, y=None, duration=0.0):

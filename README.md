@@ -120,7 +120,7 @@ import directinput
 - **`mouseClick(button='left', interval=0.01, presses=1, key_delay=0.01)`**
   - Simulates mouse click events.
   - **Parameters:**
-    - `button` (str, optional): The mouse button to click ('left', 'right', or 'middle'). Default is 'left'.
+    - `button` (str, optional): The mouse button to click ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
     - `interval` (float, optional): The interval (in seconds) between each click. Default is 0.01.
     - `presses` (int, optional): The number of times to click the mouse button. Default is 1.
     - `key_delay` (float, optional): The delay (in seconds) between each click down and click release. Default is 0.01.
@@ -129,40 +129,48 @@ import directinput
     directinput.mouseClick('left')
     directinput.mouseClick('right', presses=2, interval=0.5)
     directinput.mouseClick('middle', presses=3)
+    directinput.mouseClick('xbutton1')
+    directinput.mouseClick('xbutton2')
     ```
 
 - **`mouseDown(button='left')`**
   - Simulates pressing down a mouse button.
   - **Parameters:**
-    - `button` (str, optional): The mouse button to press ('left', 'right', or 'middle'). Default is 'left'.
+    - `button` (str, optional): The mouse button to press ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
   - **Example:**
     ```python
     directinput.mouseDown('left')
     directinput.mouseDown('right')
     directinput.mouseDown('middle')
+    directinput.mouseDown('xbutton1')
+    directinput.mouseDown('xbutton2')
     ```
 
 - **`mouseUp(button='left')`**
   - Simulates releasing a mouse button.
   - **Parameters:**
-    - `button` (str, optional): The mouse button to release ('left', 'right', or 'middle'). Default is 'left'.
+    - `button` (str, optional): The mouse button to release ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
   - **Example:**
     ```python
     directinput.mouseUp('left')
     directinput.mouseUp('right')
     directinput.mouseUp('middle')
+    directinput.mouseUp('xbutton1')
+    directinput.mouseUp('xbutton2')
     ```
 
 - **`mouseHold(button='left')`**
   - Simulates holding down a specified mouse button, similar to the `keyHold` function.
-  - The `button` parameter can be 'left', 'right', or 'middle'.
+  - The `button` parameter can be 'left', 'right', 'middle', 'xbutton1', or 'xbutton2'.
   - This function should be used with a `with` statement to ensure that the mouse button is released after the block of code is executed.
   - **Parameters:**
-    - `button` (str, optional): The mouse button to hold down ('left', 'right', or 'middle'). Default is 'left'.
+    - `button` (str, optional): The mouse button to hold down ('left', 'right', 'middle', 'xbutton1', or 'xbutton2'). Default is 'left'.
   - **Example:**
     ```python
     with directinput.mouseHold('right'):
         directinput.keyPress("esc")
+    with directinput.mouseHold('xbutton1'):
+        directinput.keyPress("a")
     ```
 
 - **`moveMouseTo(x=None, y=None, duration=0.0)`**
@@ -263,21 +271,21 @@ import directinput
 
 ## Available Keys and Mouse Buttons
 
-All the keys listed can be detected as well as pressed, except `xbutton1` and `xbutton2`, which cannot be pressed.
+All the keys and mouse buttons listed can be both detected and pressed.
 
 ### Keyboard Keys
 
-- **Alphabets**: 
+- **Alphabets**:
   - `a`, `A`, `b`, `B`, `c`, `C`, `d`, `D`, `e`, `E`, `f`, `F`, `g`, `G`, `h`, `H`, `i`, `I`, `j`, `J`, `k`, `K`, `l`, `L`, `m`, `M`, `n`, `N`, `o`, `O`, `p`, `P`, `q`, `Q`, `r`, `R`, `s`, `S`, `t`, `T`, `u`, `U`, `v`, `V`, `w`, `W`, `x`, `X`, `y`, `Y`, `z`, `Z`
 
-- **Numbers**: 
+- **Numbers**:
   - `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`
   - `num0`, `num1`, `num2`, `num3`, `num4`, `num5`, `num6`, `num7`, `num8`, `num9`
 
 - **Symbols**:
   - `` ` ``, `~`, `!`, `@`, `#`, `$`, `%`, `^`, `&`, `*`, `(`, `)`, `-`, `_`, `=`, `+`, `[`, `{`, `]`, `}`, `\`, `|`, `;`, `:`, `'`, `"`, `,`, `<`, `.`, `>`, `/`, `?`
 
-- **Function Keys**: 
+- **Function Keys**:
   - `f1`, `f2`, `f3`, `f4`, `f5`, `f6`, `f7`, `f8`, `f9`, `f10`, `f11`, `f12`
 
 - **Control Keys**:
@@ -286,16 +294,16 @@ All the keys listed can be detected as well as pressed, except `xbutton1` and `x
 - **Calculation Keys**:
   - `num-`, `num/`, `num*`, `num+`, `num.`
 
-- **Arrow Keys**: 
+- **Arrow Keys**:
   - `up`, `down`, `left`, `right`
 
 ### Mouse Buttons
 
-- **Primary Buttons**: 
+- **Primary Buttons**:
   - `left`, `right`, `middle`
 
-- **Additional Buttons**: 
-  - `xbutton1` (can only be detected), `xbutton2` (can only be detected)
+- **Additional Buttons**:
+  - `xbutton1`, `xbutton2` (extra mouse buttons)
 
 ## Example Usage
 
