@@ -1,14 +1,14 @@
-# WinDirectInput
+# winDirectInput
 
-**WinDirectInput** is born out of a desire to enhance and extend the capabilities left untouched by PyAutoGUI. It's a robust tool designed for developers and automation enthusiasts. This module excels in detecting key inputs and offers an improved screenshot functionality using mss, providing a faster alternative for real-time applications like object detection with OpenCV.
+**winDirectInput** is born out of a desire to enhance and extend the capabilities left untouched by PyAutoGUI. It's a robust tool designed for developers and automation enthusiasts. This module excels in detecting key inputs and offers an improved screenshot functionality using mss, providing a faster alternative for real-time applications like object detection with OpenCV.
 
 This module is a testament to innovation in automation, filling gaps and pushing the boundaries of what's possible in automated input control.
 
 ## Installation
 
-To start using WinDirectInput, simply install it via pip:
+To start using winDirectInput, simply install it via pip:
 ```bash
-pip install WinDirectInput
+pip install winDirectInput
 ```
 
 After installation, you can import and use the module in your Python scripts:
@@ -18,7 +18,7 @@ import directinput
 
 ## Dependencies
 
-**WinDirectInput** thrives on the shoulders of powerful dependencies and requires Python 3.8 or higher. Key dependencies include:
+**winDirectInput** thrives on the shoulders of powerful dependencies and requires Python 3.8 or higher. Key dependencies include:
 
 - `opencv-python`: For image processing and object detection integrations.
 - `numpy`: Essential for handling arrays and complex mathematical operations.
@@ -213,7 +213,7 @@ import directinput
 
 ### Failsafe Mechanism
 
-WinDirectInput includes a failsafe mechanism that allows you to abort script execution by holding down specific keys for a set duration. This is useful for regaining control if your automation script goes awry.
+winDirectInput includes a failsafe mechanism that allows you to abort script execution by holding down specific keys for a set duration. This is useful for regaining control if your automation script goes awry.
 
 By default, the failsafe is enabled when you import the module and will terminate the script if you hold down the **Esc key for 5 seconds**. This behavior can be customized using the functions below.
 
@@ -411,7 +411,7 @@ print("Automation completed successfully")
 
 ### Locating an Image on the Screen
 
-The locateImage function in WinDirectInput adds a layer of flexibility to image detection. Whether you're automating tasks based on visual cues or integrating with image processing, this function is incredibly handy.
+The locateImage function in winDirectInput adds a layer of flexibility to image detection. Whether you're automating tasks based on visual cues or integrating with image processing, this function is incredibly handy.
 
 ```Python
 import directinput
@@ -427,11 +427,11 @@ else:
 
 ## How Does It Work?
 
-**WinDirectInput** is tailored for Windows 10 or higher systems, harnessing the underlying Windows API to deliver its functionalities. This specific design choice ensures compatibility and performance, particularly in how keyboard and mouse inputs are handled and how screenshots are captured and processed.
+**winDirectInput** is tailored for Windows 10 or higher systems, harnessing the underlying Windows API to deliver its functionalities. This specific design choice ensures compatibility and performance, particularly in how keyboard and mouse inputs are handled and how screenshots are captured and processed.
 
 ## Your Contribution Matters
 
-Your insights and contributions are pivotal to the evolution of WinDirectInput. Here's how you can get involved:
+Your insights and contributions are pivotal to the evolution of winDirectInput. Here's how you can get involved:
 
-- Report Bugs or Request Features: Encounter a bug or have an idea for a new feature? Open an issue on our [GitHub](https://github.com/abdulrahimpds/WinDirectInput) page.
+- Report Bugs or Request Features: Encounter a bug or have an idea for a new feature? Open an issue on our [GitHub](https://github.com/abdulrahimpds/winDirectInput) page.
 - Code Contributions: Got a fix or enhancement? Submit a pull request to improve the codebase.
