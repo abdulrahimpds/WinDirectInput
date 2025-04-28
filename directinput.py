@@ -8,6 +8,9 @@ import ctypes
 import mss
 import pyscreeze
 import pyperclip
+import threading
+import time
+import os
 
 from time import sleep
 from collections import namedtuple
@@ -1406,3 +1409,185 @@ def locateImage(needleImage, haystackImage=None, grayscale=False,
         # Return the center coordinates of the image
         center_x, center_y = float(coords[0] + coords[2]/2), float(coords[1] + coords[3]/2)
         return Point(center_x, center_y)
+
+
+# Failsafe Mechanism
+
+class Failsafe:
+    """
+    A failsafe mechanism to abort script execution when certain keys are held down.
+
+    This class implements a failsafe mechanism that monitors for specified keys being
+    held down for a certain duration. When triggered, it will abort the script execution.
+    By default, it monitors the Esc key for 5 seconds.
+
+    Attributes:
+        enabled (bool): Whether the failsafe is enabled.
+        trigger_keys (list): List of keys that trigger the failsafe when held down.
+        hold_time (float): Duration in seconds that keys must be held to trigger.
+        callback (callable): Function to call when failsafe is triggered.
+        _thread (Thread): Background thread that monitors key states.
+        _stop_event (Event): Event to signal the monitoring thread to stop.
+    """
+
+    def __init__(self, trigger_keys=['esc'], hold_time=5.0, callback=None):
+        """
+        Initialize the failsafe mechanism.
+
+        Args:
+            trigger_keys (list): Keys that trigger the failsafe when held down.
+            hold_time (float): Duration in seconds that keys must be held to trigger.
+            callback (callable): Function to call when failsafe is triggered.
+                                If None, the script will exit with sys.exit(1).
+        """
+        self.enabled = True
+        self.trigger_keys = trigger_keys if isinstance(trigger_keys, list) else [trigger_keys]
+        self.hold_time = hold_time
+        self.callback = callback
+        self._thread = None
+        self._stop_event = threading.Event()
+
+        # Start the monitoring thread
+        self._start_monitoring()
+
+    def _start_monitoring(self):
+        """Start the background thread that monitors key states."""
+        if self._thread is None or not self._thread.is_alive():
+            self._stop_event.clear()
+            self._thread = threading.Thread(target=self._monitor_keys, daemon=True)
+            self._thread.start()
+
+    def _monitor_keys(self):
+        """Monitor key states in a background thread."""
+        key_hold_start = None
+
+        while not self._stop_event.is_set():
+            if not self.enabled:
+                key_hold_start = None
+                time.sleep(0.1)
+                continue
+
+            # Check if all trigger keys are pressed
+            all_keys_pressed = all(keyDetect(key) for key in self.trigger_keys)
+
+            if all_keys_pressed:
+                # If keys just started being pressed, record the time
+                if key_hold_start is None:
+                    key_hold_start = time.time()
+                    print(f"Failsafe: Holding {', '.join(self.trigger_keys)} detected. "
+                          f"Hold for {self.hold_time} seconds to trigger failsafe.")
+
+                # Check if keys have been held long enough
+                elif time.time() - key_hold_start >= self.hold_time:
+                    self._trigger_failsafe()
+                    return
+            else:
+                # Reset the timer if keys are released
+                key_hold_start = None
+
+            # Sleep to prevent high CPU usage
+            time.sleep(0.1)
+
+    def _trigger_failsafe(self):
+        """Trigger the failsafe action."""
+        print("\nFAILSAFE TRIGGERED!")
+        print(f"Keys {', '.join(self.trigger_keys)} held for {self.hold_time} seconds.")
+
+        if self.callback:
+            self.callback()
+        else:
+            print("Aborting script execution.")
+            # Use os._exit() to force immediate termination of the entire process
+            # This is more forceful than sys.exit() and will terminate all threads
+            os._exit(1)
+
+    def stop(self):
+        """Stop the failsafe monitoring thread."""
+        self._stop_event.set()
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=1.0)
+
+    def enable(self):
+        """Enable the failsafe mechanism."""
+        self.enabled = True
+        print("Failsafe enabled.")
+
+    def disable(self):
+        """Disable the failsafe mechanism."""
+        self.enabled = False
+        print("Failsafe disabled.")
+
+    def configure(self, trigger_keys=None, hold_time=None, callback=None):
+        """
+        Configure the failsafe parameters.
+
+        Args:
+            trigger_keys (list or str, optional): Keys that trigger the failsafe.
+            hold_time (float, optional): Duration in seconds keys must be held.
+            callback (callable, optional): Function to call when triggered.
+        """
+        if trigger_keys is not None:
+            self.trigger_keys = trigger_keys if isinstance(trigger_keys, list) else [trigger_keys]
+
+        if hold_time is not None:
+            self.hold_time = float(hold_time)
+
+        if callback is not None:
+            self.callback = callback
+
+        print(f"Failsafe configured: Keys={self.trigger_keys}, Hold time={self.hold_time}s")
+
+
+# Create a global failsafe instance
+_failsafe = Failsafe()
+
+def enableFailsafe():
+    """
+    Enable the failsafe mechanism.
+
+    The failsafe mechanism allows you to abort script execution by holding down
+    the configured key(s) for the specified duration.
+
+    Example:
+    enableFailsafe()  # Enable the default failsafe (Esc key for 5 seconds)
+    """
+    global _failsafe
+    _failsafe.enable()
+
+def disableFailsafe():
+    """
+    Disable the failsafe mechanism.
+
+    This function disables the failsafe mechanism, preventing it from
+    aborting script execution when the trigger keys are held down.
+
+    Example:
+    disableFailsafe()  # Disable the failsafe mechanism
+    """
+    global _failsafe
+    _failsafe.disable()
+
+def configFailsafe(trigger_keys=None, hold_time=None, callback=None):
+    """
+    Configure the failsafe mechanism.
+
+    This function allows you to customize the failsafe mechanism by specifying
+    which keys trigger it, how long they need to be held, and what action to take.
+
+    Parameters:
+    trigger_keys : str or list, optional
+        The key or list of keys that trigger the failsafe when held down.
+        Default is ['esc'] (the Escape key).
+    hold_time : float, optional
+        The duration in seconds that the keys must be held to trigger the failsafe.
+        Default is 5.0 seconds.
+    callback : callable, optional
+        A function to call when the failsafe is triggered. If not specified,
+        the script will forcefully terminate using os._exit(1).
+
+    Example:
+    configureFailsafe(['ctrl', 'alt'], 3.0)  # Trigger when Ctrl+Alt is held for 3 seconds
+    configureFailsafe('f12', 2.0)            # Trigger when F12 is held for 2 seconds
+    """
+    global _failsafe
+    _failsafe.configure(trigger_keys, hold_time, callback)

@@ -211,6 +211,62 @@ import directinput
     directinput.scrollMouse(-100)  # Scroll down with a value of 100 clicks.
     ```
 
+### Failsafe Mechanism
+
+WinDirectInput includes a failsafe mechanism that allows you to abort script execution by holding down specific keys for a set duration. This is useful for regaining control if your automation script goes awry.
+
+By default, the failsafe is enabled when you import the module and will terminate the script if you hold down the **Esc key for 5 seconds**. This behavior can be customized using the functions below.
+
+- **`enableFailsafe()`**
+  - Enables the failsafe mechanism.
+  - By default, the failsafe is enabled when the module is imported.
+  - **Example:**
+    ```python
+    directinput.enableFailsafe()  # Enable the default failsafe (Esc key for 5 seconds)
+    ```
+
+- **`disableFailsafe()`**
+  - Disables the failsafe mechanism.
+  - Use this with caution, as it removes your safety net.
+  - When disabled, the failsafe keys can be held down without triggering script termination.
+  - This is useful for sections of code where you need to use the failsafe keys for other purposes.
+  - **Example:**
+    ```python
+    # Disable failsafe completely for the entire script
+    directinput.disableFailsafe()
+
+    # Or disable temporarily for a specific section
+    directinput.disableFailsafe()
+    try:
+        # Run operations where failsafe might interfere
+        # ...
+    finally:
+        # Re-enable failsafe when done
+        directinput.enableFailsafe()
+    ```
+
+- **`configFailsafe(trigger_keys=None, hold_time=None, callback=None)`**
+  - Configures the failsafe mechanism.
+  - **Parameters:**
+    - `trigger_keys` (str or list, optional): The key or list of keys that trigger the failsafe when held down. Default is ['esc'] (the Escape key).
+    - `hold_time` (float, optional): The duration in seconds that the keys must be held to trigger the failsafe. Default is 5.0 seconds.
+    - `callback` (callable, optional): A function to call when the failsafe is triggered. If not specified, the script will forcefully terminate using os._exit(1).
+  - **Example:**
+    ```python
+    # Configure failsafe to trigger when Ctrl+Alt is held for 3 seconds
+    directinput.configFailsafe(['ctrl', 'alt'], 3.0)
+
+    # Configure failsafe to trigger when F12 is held for 2 seconds
+    directinput.configFailsafe('f12', 2.0)
+
+    # Configure failsafe with a custom callback function
+    def my_failsafe_handler():
+        print("Failsafe triggered! Cleaning up...")
+        # Custom cleanup code here
+
+    directinput.configFailsafe('esc', 5.0, my_failsafe_handler)
+    ```
+
 ### Utility Functions
 
 - **`screenshot(filename=None, region=None)`**
@@ -330,6 +386,27 @@ if directinput.keyDetect('a'):
 # Detect if both 'left_mouse' and 'xbutton1' is being pressed
 if directinput.keyDetect(['left_mouse', 'xbutton1']):
     print("Pressed!")
+```
+
+### Using the Failsafe Mechanism
+
+The failsafe mechanism provides a safety net for your automation scripts, allowing you to regain control if something goes wrong.
+
+```Python
+import directinput
+import time
+
+# Configure the failsafe to use F12 key held for 3 seconds
+directinput.configFailsafe('f12', 3.0)
+
+# Run a potentially risky automation task
+print("Starting automation. Hold F12 for 3 seconds to abort.")
+for i in range(10):
+    directinput.mouseClick()  # Click repeatedly
+    time.sleep(1)
+    print(f"Step {i+1}/10 completed")
+
+print("Automation completed successfully")
 ```
 
 ### Locating an Image on the Screen
